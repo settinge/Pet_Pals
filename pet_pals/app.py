@@ -24,7 +24,27 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-from .models import Pet
+import sys
+sys.path.append(".")
+
+from pet_pals.app import db
+
+
+class Pat(db.Model):
+    __tablename__ = 'pats'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    lat = db.Column(db.Float)
+    lon = db.Column(db.Float)
+
+    def __repr__(self):
+        return '<Pet %r>' % (self.name)
+
+# import sys
+# sys.path.append(".")
+# from pet_pals.mad import Pat
 
 
 # create route that renders index.html template
@@ -41,7 +61,7 @@ def send():
         lat = request.form["petLat"]
         lon = request.form["petLon"]
 
-        pet = Pet(name=name, lat=lat, lon=lon)
+        pet = Pat(name=name, lat=lat, lon=lon)
         db.session.add(pet)
         db.session.commit()
         return redirect("/", code=302)
@@ -51,7 +71,7 @@ def send():
 
 @app.route("/api/pals")
 def pals():
-    results = db.session.query(Pet.name, Pet.lat, Pet.lon).all()
+    results = db.session.query(Pat.name, Pat.lat, Pat.lon).all()
 
     hover_text = [result[0] for result in results]
     lat = [result[1] for result in results]
